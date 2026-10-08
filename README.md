@@ -1,0 +1,1 @@
+# next-betterAuth-template-v1
