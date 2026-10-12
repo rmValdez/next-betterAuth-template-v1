@@ -101,6 +101,7 @@ export async function fetcher<T>(
     };
 
     const res = await fetch(`${env.NEXT_PUBLIC_API_URL}${url}`, {
+      credentials: "include",
       ...options,
       headers,
     });
@@ -145,6 +146,7 @@ export async function fetcher<T>(
             return new Promise((resolve, reject) => {
               refreshSubscribers.push((newToken: string) => {
                 fetcher<T>(url, {
+                  credentials: "include",
                   ...options,
                   headers: {
                     ...options?.headers,

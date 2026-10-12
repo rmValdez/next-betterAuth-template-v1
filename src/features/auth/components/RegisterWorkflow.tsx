@@ -1,22 +1,23 @@
 "use client";
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Card } from "@/shared/components/ui/Card";
-import { User, ShieldCheck, Smartphone } from "lucide-react";
+import { User, Code2, Loader2, UserPlus } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import type { UserRole as ApiUserRole } from "../api/login.api";
 
-type AuthStep = "ROLE_SELECT" | "FIELDS_FORM" | "BUYER_APP_PROMPT";
-type UserRole = "buyer" | "seller";
+type AuthStep = "ROLE_SELECT" | "FIELDS_FORM";
+type RegisterRole = "user" | "developer";
 
 export default function RegisterWorkflow({
-  onCompleteSeller,
+  onCompleteRegistration,
 }: {
-  onCompleteSeller: () => void;
+  onCompleteRegistration: () => void;
 }) {
   const [step, setStep] = useState<AuthStep>("ROLE_SELECT");
-  const [role, setRole] = useState<UserRole | null>(null);
+  const [role, setRole] = useState<RegisterRole>("user");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -30,14 +31,13 @@ export default function RegisterWorkflow({
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleRoleSelect = (selectedRole: UserRole) => {
+  const handleRoleSelect = (selectedRole: RegisterRole) => {
     setRole(selectedRole);
     setStep("FIELDS_FORM");
   };
 
   const handleRegisterSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!role) return;
 
     try {
       await register(
@@ -49,11 +49,8 @@ export default function RegisterWorkflow({
         },
         role.toUpperCase() as ApiUserRole,
       );
-      if (role === "buyer") {
-        setStep("BUYER_APP_PROMPT");
-      } else {
-        onCompleteSeller();
-      }
+      toast.success("Registration complete! Welcome aboard.");
+      onCompleteRegistration();
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Registration failed. Try again.",
@@ -70,48 +67,47 @@ export default function RegisterWorkflow({
               Create Your NextTemplate Account
             </h2>
             <p className="text-xs text-zinc-400">
-              Select your workspace interface to register
+              Select your workspace role to get started
             </p>
           </div>
           <div className="grid grid-cols-1 gap-3">
             <button
-              onClick={() => handleRoleSelect("buyer")}
-              className="flex items-center gap-4 p-4 border rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+              onClick={() => handleRoleSelect("user")}
+              className="flex items-center gap-4 p-4 border rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer text-left"
               style={{ borderColor: "var(--border-light)" }}
             >
-              <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-500">
+              <div className="p-2.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-500">
                 <User className="w-5 h-5" />
               </div>
               <div className="text-left">
-                <div className="text-xs font-bold">Register as a Buyer</div>
+                <div className="text-xs font-bold">Standard User</div>
                 <p className="text-[10px] text-zinc-400">
-                  Explore hyper-local networks, view physical markers, and place
-                  local pick-ups.
+                  Standard account access to dashboards, profile, and workspaces.
                 </p>
               </div>
             </button>
 
             <button
-              onClick={() => handleRoleSelect("seller")}
-              className="flex items-center gap-4 p-4 border rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+              onClick={() => handleRoleSelect("developer")}
+              className="flex items-center gap-4 p-4 border rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer text-left"
               style={{ borderColor: "var(--border-light)" }}
             >
-              <div className="p-2.5 rounded-lg bg-brand-core/10 text-zinc-900 dark:text-zinc-100">
-                <ShieldCheck
-                  className="w-5 h-5"
-                  style={{ color: "var(--brand-core)" }}
-                />
+              <div className="p-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-500">
+                <Code2 className="w-5 h-5" />
               </div>
               <div className="text-left">
-                <div className="text-xs font-bold">
-                  Register as a Verified Merchant
-                </div>
+                <div className="text-xs font-bold">Developer Access</div>
                 <p className="text-[10px] text-zinc-400">
-                  Map store coordinates, drop cloud catalog layers, and service
-                  offline commerce.
+                  Developer account with API sandbox access and system telemetry.
                 </p>
               </div>
             </button>
+          </div>
+          <div className="pt-2 text-center text-xs text-[var(--text-tertiary)]">
+            Already have an account?{" "}
+            <Link href="/login" className="font-bold text-[var(--brand-core)] hover:underline">
+              Sign in
+            </Link>
           </div>
         </Card>
       )}
@@ -119,9 +115,9 @@ export default function RegisterWorkflow({
       {step === "FIELDS_FORM" && (
         <Card className="p-6">
           <div className="mb-4">
-            <h2 className="text-base font-black">Account Parameters</h2>
+            <h2 className="text-base font-black">Account Details</h2>
             <p className="text-xs text-zinc-400">
-              Registering account layout profile as a{" "}
+              Registering account profile as a{" "}
               <span className="font-bold text-zinc-600 dark:text-zinc-300 capitalize">
                 {role}
               </span>
@@ -139,7 +135,7 @@ export default function RegisterWorkflow({
                   required
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-xl text-xs bg-background focus:outline-none"
+                  className="w-full px-3 py-2 rounded-lg border text-xs bg-transparent focus:outline-none focus:border-sky-500"
                   style={{ borderColor: "var(--border-light)" }}
                 />
               </div>
@@ -153,7 +149,7 @@ export default function RegisterWorkflow({
                   required
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border rounded-xl text-xs bg-background focus:outline-none"
+                  className="w-full px-3 py-2 rounded-lg border text-xs bg-transparent focus:outline-none focus:border-sky-500"
                   style={{ borderColor: "var(--border-light)" }}
                 />
               </div>
@@ -167,10 +163,9 @@ export default function RegisterWorkflow({
                 type="email"
                 name="email"
                 required
-                placeholder="name@domain.com"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-xl text-xs bg-background focus:outline-none"
+                className="w-full px-3 py-2 rounded-lg border text-xs bg-transparent focus:outline-none focus:border-sky-500"
                 style={{ borderColor: "var(--border-light)" }}
               />
             </div>
@@ -183,10 +178,9 @@ export default function RegisterWorkflow({
                 type="password"
                 name="password"
                 required
-                minLength={8}
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded-xl text-xs bg-background focus:outline-none"
+                className="w-full px-3 py-2 rounded-lg border text-xs bg-transparent focus:outline-none focus:border-sky-500"
                 style={{ borderColor: "var(--border-light)" }}
               />
             </div>
@@ -194,44 +188,31 @@ export default function RegisterWorkflow({
             <button
               type="submit"
               disabled={isRegistering}
-              className="w-full mt-2 py-2 text-xs font-bold rounded-xl text-white bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 hover:opacity-90 disabled:opacity-50 transition-opacity"
+              className="w-full py-2.5 mt-2 rounded-lg text-xs font-bold text-white bg-[var(--brand-core)] hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              {isRegistering ? "Generating Credentials..." : "Create Account"}
+              {isRegistering ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-3.5 h-3.5" />
+                  Complete Registration
+                </>
+              )}
             </button>
-          </form>
-        </Card>
-      )}
 
-      {step === "BUYER_APP_PROMPT" && (
-        <Card className="p-6 text-center space-y-4 py-8 animate-in fade-in duration-300">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-500 flex items-center justify-center mx-auto">
-            <Smartphone className="w-6 h-6" />
-          </div>
-          <div>
-            <h2 className="text-base font-black">
-              Download NextTemplate Mobile
-            </h2>
-            <p className="text-xs text-zinc-400 max-w-xs mx-auto mt-1">
-              Account successfully verified! To purchase, look up active store
-              pins, and check out locally, please install our native mobile
-              companion interface.
-            </p>
-          </div>
-          <div className="pt-2 flex flex-col gap-2">
-            <a
-              href="#app-store"
-              className="w-full py-2 text-center text-xs font-bold border rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900"
-              style={{ borderColor: "var(--border-light)" }}
-            >
-              Download on iOS App Store
-            </a>
-            <a
-              href="#google-play"
-              className="w-full py-2 text-center text-xs font-bold text-white bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 rounded-xl hover:opacity-90"
-            >
-              Get it on Google Play
-            </a>
-          </div>
+            <div className="pt-2 text-center text-xs text-zinc-400">
+              <button
+                type="button"
+                onClick={() => setStep("ROLE_SELECT")}
+                className="hover:underline text-[11px]"
+              >
+                Back to role selection
+              </button>
+            </div>
+          </form>
         </Card>
       )}
     </div>

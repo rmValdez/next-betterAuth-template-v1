@@ -1,75 +1,97 @@
 // src/features/auth/api/login.api.ts
-import { fetcher } from "@/shared/lib/http";
+import { authClient } from "@/shared/lib/auth-client";
 import {
-  LoginResponseEnvelopeSchema,
-  AuthResultSchema,
   type AuthResult,
 } from "../contracts/auth.contract";
 
-// Unified type definitions
-export type UserRole = "BUYER" | "SELLER" | "ADMIN" | "SUPPORT_AGENT";
+// Unified role definitions matching backend Prisma UserRole
+export type UserRole = "USER" | "ADMIN" | "SUPER_ADMIN" | "DEVELOPER";
 
-interface AuthResponse {
-  accessToken: string;
+export interface AuthResponse {
+  accessToken?: string;
   hasStoreBranches?: boolean;
 }
 
 /**
- * Unified Unified Login Handler
- * Replaces both loginBuyer and loginSeller
+ * Better Auth Login Handler
+ * Uses the Better Auth client to sign in and set session cookies.
  */
 export const login = async (
   credentials: Record<string, string>,
-  roleName: UserRole,
+  roleName?: UserRole,
 ): Promise<AuthResult> => {
-  const raw = await fetcher<unknown>("/api/v1/auth/login", {
-    method: "POST",
-    body: JSON.stringify({
-      ...credentials,
-      roleName, // Injected dynamically ("BUYER" or "SELLER")
-    }),
+  const { data, error } = await authClient.signIn.email({
+    email: credentials.email,
+    password: credentials.password,
   });
 
-  const envelope = LoginResponseEnvelopeSchema.parse(raw);
-  return AuthResultSchema.parse({
-    accessToken: envelope.data.accessToken,
-    refreshToken: envelope.data.refreshToken,
-    hasStores: Array.isArray(envelope.data.stores)
-      ? envelope.data.stores.length > 0
-      : false,
-    user: envelope.data.user,
-    seller: envelope.data.seller,
-  });
-};
+  if (error) {
+    throw new Error(error.message || "Invalid credentials or login failed.");
+  }
 
-/**
- * Unified Registration Handler
- * Replaces both registerBuyer and registerSeller
- */
-export const register = async (
-  userData: Record<string, string>,
-  roleName: UserRole,
-) => {
-  const res = await fetcher<{ data: AuthResponse }>("/api/v1/auth/register", {
-    method: "POST",
-    body: JSON.stringify({
-      ...userData,
-      roleName, // Injected dynamically ("BUYER" or "SELLER")
-    }),
-  });
+  const user = data?.user;
+  const sessionToken =
+    (data as any)?.token ||
+    (data as any)?.session?.token ||
+    "better-auth-session";
 
-  // Safe navigation in case your backend registration doesn't return data (like in your controller)
+  const userRole = ((user as any)?.role || roleName || "USER") as string;
+
   return {
-    accessToken: res?.data?.accessToken,
-    hasStoreBranches: res?.data?.hasStoreBranches,
+    accessToken: sessionToken,
+    refreshToken: undefined,
+    hasStores: false,
+    user: user
+      ? {
+          id: user.id,
+          email: user.email,
+          firstName: (user as any).firstName || (user.name ? user.name.split(" ")[0] : ""),
+          lastName: (user as any).lastName || (user.name ? user.name.split(" ").slice(1).join(" ") : ""),
+          role: userRole,
+        }
+      : undefined,
+    seller: null,
   };
 };
 
 /**
- * Universal Global Logout Handler
+ * Better Auth Registration Handler
+ * Creates account on the backend Better Auth instance and starts session.
  */
-export const logout = async () => {
-  return fetcher("/api/v1/auth/logout", {
-    method: "POST",
+export const register = async (
+  userData: Record<string, string>,
+  roleName: UserRole = "USER",
+): Promise<AuthResponse> => {
+  const fullName =
+    `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
+    userData.email.split("@")[0];
+
+  const { data, error } = await (authClient.signUp.email as any)({
+    email: userData.email,
+    password: userData.password,
+    name: fullName,
+    role: roleName,
   });
+
+  if (error) {
+    throw new Error(error.message || "Registration failed.");
+  }
+
+  const sessionToken =
+    (data as any)?.token ||
+    (data as any)?.session?.token ||
+    "better-auth-session";
+
+  return {
+    accessToken: sessionToken,
+    hasStoreBranches: false,
+  };
+};
+
+/**
+ * Better Auth Logout Handler
+ * Revokes session cookie and cleans up active session.
+ */
+export const logout = async (): Promise<void> => {
+  await authClient.signOut();
 };

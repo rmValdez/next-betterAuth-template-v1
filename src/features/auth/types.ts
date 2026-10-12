@@ -3,4 +3,4 @@ export interface AuthSession {
 }
 
 /// Role as selected in the login form (lowercase, UI-level).
-export type LoginRole = "buyer" | "seller" | "admin" | "support_agent";
+export type LoginRole = "user" | "admin" | "super_admin" | "developer";

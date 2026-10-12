@@ -1,5 +1,5 @@
 {
-  "name": "next-template-v1",
+  "name": "next-betterAuth-template-v1",
   "version": "1.1.0",
   "private": true,
   "packageManager": "pnpm@9.0.0",
@@ -44,7 +44,8 @@
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3",
-    "zustand": "^5.0.14"
+    "zustand": "^5.0.14",
+    "better-auth": "^1.7.7"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",

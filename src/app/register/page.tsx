@@ -8,7 +8,7 @@ export default function RegisterEntryRoot() {
   const router = useRouter();
 
   const handleRegisterSuccess = () => {
-    router.push("/seller/onboarding");
+    router.push("/login");
   };
 
   return (
@@ -16,7 +16,7 @@ export default function RegisterEntryRoot() {
       className="min-h-screen flex items-center justify-center transition-colors"
       style={{ backgroundColor: "var(--background-secondary)" }}
     >
-      <RegisterWorkflow onCompleteSeller={handleRegisterSuccess} />
+      <RegisterWorkflow onCompleteRegistration={handleRegisterSuccess} />
     </div>
   );
 }

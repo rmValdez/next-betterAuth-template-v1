@@ -1,37 +1,28 @@
 "use client";
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Card } from "@/shared/components/ui/Card";
-import {
-  LogIn,
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  Loader2,
-  ShieldCheck,
-  UserCheck,
-  Sparkles,
-} from "lucide-react";
-import Link from "next/link";
+import { LogIn, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-import type { UserRole as ApiUserRole } from "../api/login.api";
 import type { LoginRole } from "../types";
+import type { UserRole as ApiUserRole } from "../api/login.api";
 
-export default function LoginForm({
-  onLoginSuccess,
-}: {
+interface LoginFormProps {
   onLoginSuccess: (
     role: LoginRole,
     hasStores: boolean,
     seller?: { isOnboarded: boolean; onboardingStep: number },
   ) => void;
-}) {
-  const [role, setRole] = useState<LoginRole>("seller");
+}
+
+export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [role, setRole] = useState<LoginRole>("user");
   const [showPassword, setShowPassword] = useState(false);
   const [loadingStep, setLoadingStep] = useState<string>("");
+
   const { login, isLoggingIn } = useAuth();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -101,14 +92,14 @@ export default function LoginForm({
         <button
           type="button"
           disabled={isLoggingIn}
-          onClick={() => setRole("seller")}
+          onClick={() => setRole("user")}
           className={`py-2 text-[10px] font-extrabold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1 ${
-            role === "seller"
+            role === "user"
               ? "bg-[var(--brand-core)] text-white shadow-md"
               : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
           }`}
         >
-          Merchant
+          User
         </button>
         <button
           type="button"
@@ -125,14 +116,14 @@ export default function LoginForm({
         <button
           type="button"
           disabled={isLoggingIn}
-          onClick={() => setRole("support_agent")}
+          onClick={() => setRole("developer")}
           className={`py-2 text-[10px] font-extrabold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1 ${
-            role === "support_agent"
-              ? "bg-[var(--brand-core)] text-white shadow-md"
+            role === "developer"
+              ? "bg-indigo-600 text-white shadow-md"
               : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
           }`}
         >
-          Agent
+          Developer
         </button>
       </div>
 
