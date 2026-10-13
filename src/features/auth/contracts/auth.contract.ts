@@ -6,7 +6,7 @@ export const UserRoleSchema = z.enum(["USER", "ADMIN", "SUPER_ADMIN", "DEVELOPER
 /** Result of a Better Auth sign-in / sign-up, normalized for the app. */
 export const AuthResultSchema = z.object({
   /** Better Auth session token — sent as `Authorization: Bearer` by `fetcher`. */
-  accessToken: z.string(),
+  sessionToken: z.string(),
   user: z
     .object({
       id: z.string(),

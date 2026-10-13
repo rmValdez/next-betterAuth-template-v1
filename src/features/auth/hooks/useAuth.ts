@@ -25,7 +25,7 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      if (data.accessToken) setToken(data.accessToken);
+      if (data.sessionToken) setToken(data.sessionToken);
       queryClient.invalidateQueries();
     },
   });
@@ -33,7 +33,7 @@ export function useAuth() {
   const registerMutation = useMutation({
     mutationFn: register,
     onSuccess: (data) => {
-      if (data.accessToken) setToken(data.accessToken);
+      if (data.sessionToken) setToken(data.sessionToken);
       queryClient.invalidateQueries();
     },
   });
