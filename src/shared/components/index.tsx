@@ -15,15 +15,7 @@ export * from "./Skeleton";
 // export * from "./ui/FormField";
 
 // ============================================================================
-// 2. STRUCTURAL LAYOUTS
+// 2. BUSINESS FEATURES LAYER
 // ============================================================================
-export { SellerLayout } from "./layout/SellerLayout";
-export { Sidebar } from "./layout/Sidebar";
-
-// ============================================================================
-// 3. BUSINESS FEATURES LAYER
-// ============================================================================
-// 🔥 REMOVED: Feature-specific elements have been safely decoupled from here.
-// They now live isolated inside their own public feature modules:
-// - Login flow -> @/features/auth
-// - Onboarding and Mapbox nodes -> @/features/stores
+// Feature-specific UI lives in its own feature module (e.g. @/features/auth),
+// composed by pages in the app layer.

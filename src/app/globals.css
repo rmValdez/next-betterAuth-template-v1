@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "mapbox-gl/dist/mapbox-gl.css";
 
 /* 2026 Theme Options:
   Option 1: Cyberpunk Blue (Deep Blue & Electric Cyan) - ACTIVE

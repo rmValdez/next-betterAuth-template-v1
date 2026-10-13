@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Sun, Moon, Github, Code2, Box, Rocket, Shield } from "lucide-react";
 
@@ -93,15 +94,18 @@ export default function Home() {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4 mb-24">
-          <button className="px-8 py-4 rounded-xl font-bold text-white bg-[var(--brand-core)] hover:opacity-90 transition-opacity shadow-lg flex items-center gap-2">
+          <Link
+            href="/dashboard"
+            className="px-8 py-4 rounded-xl font-bold text-white bg-[var(--brand-core)] hover:opacity-90 transition-opacity shadow-lg flex items-center gap-2"
+          >
             Get Started <Rocket className="w-4 h-4" />
-          </button>
-          <a
-            href="#"
+          </Link>
+          <Link
+            href="/register"
             className="px-8 py-4 rounded-xl font-bold border border-[var(--border-default)] bg-[var(--background-secondary)] hover:bg-[var(--background-tertiary)] transition-colors"
           >
-            Read the Docs
-          </a>
+            Create Account
+          </Link>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 w-full text-left">

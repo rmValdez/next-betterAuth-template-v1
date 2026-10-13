@@ -6,20 +6,14 @@ import { toast } from "sonner";
 import { Card } from "@/shared/components/ui/Card";
 import { LogIn, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-import type { LoginRole } from "../types";
-import type { UserRole as ApiUserRole } from "../api/login.api";
 
 interface LoginFormProps {
-  onLoginSuccess: (
-    role: LoginRole,
-    hasStores: boolean,
-    seller?: { isOnboarded: boolean; onboardingStep: number },
-  ) => void;
+  /** Called after a successful sign-in. The role comes from the server, not the form. */
+  onLoginSuccess: () => void;
 }
 
 export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
-  const [role, setRole] = useState<LoginRole>("user");
   const [showPassword, setShowPassword] = useState(false);
   const [loadingStep, setLoadingStep] = useState<string>("");
 
@@ -37,26 +31,15 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
       return;
     }
 
-    const toastId = toast.loading(
-      `Connecting to authentication gateway (${role.toUpperCase()})...`,
-    );
+    const toastId = toast.loading("Signing in...");
     setLoadingStep("Authenticating credentials...");
 
     try {
-      setLoadingStep("Verifying account permissions...");
-      const result = await login(
-        credentials,
-        role.toUpperCase() as ApiUserRole,
-      );
+      await login(credentials);
 
       setLoadingStep("Loading workspace...");
-      toast.success("Login verified! Redirecting to workspace...", {
-        id: toastId,
-      });
-
-      setTimeout(() => {
-        onLoginSuccess(role, result.hasStores, result.seller ?? undefined);
-      }, 500);
+      toast.success("Signed in! Redirecting...", { id: toastId });
+      onLoginSuccess();
     } catch (err) {
       setLoadingStep("");
       const message =
@@ -80,51 +63,8 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
           Welcome to NextTemplate
         </h2>
         <p className="text-xs text-[var(--text-tertiary)] mt-1">
-          Select your role and sign in to access your portal
+          Sign in to access your workspace
         </p>
-      </div>
-
-      {/* Role Selection Tabs */}
-      <div
-        className="grid grid-cols-3 gap-1.5 p-1.5 mb-6 rounded-2xl border bg-[var(--background-secondary)]"
-        style={{ borderColor: "var(--border-light)" }}
-      >
-        <button
-          type="button"
-          disabled={isLoggingIn}
-          onClick={() => setRole("user")}
-          className={`py-2 text-[10px] font-extrabold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1 ${
-            role === "user"
-              ? "bg-[var(--brand-core)] text-white shadow-md"
-              : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
-          }`}
-        >
-          User
-        </button>
-        <button
-          type="button"
-          disabled={isLoggingIn}
-          onClick={() => setRole("admin")}
-          className={`py-2 text-[10px] font-extrabold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1 ${
-            role === "admin"
-              ? "bg-cyan-600 text-white shadow-md"
-              : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
-          }`}
-        >
-          Admin
-        </button>
-        <button
-          type="button"
-          disabled={isLoggingIn}
-          onClick={() => setRole("developer")}
-          className={`py-2 text-[10px] font-extrabold uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1 ${
-            role === "developer"
-              ? "bg-indigo-600 text-white shadow-md"
-              : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
-          }`}
-        >
-          Developer
-        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -154,12 +94,6 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
             <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-tertiary)]">
               Password
             </label>
-            <a
-              href="#forgot"
-              className="text-[10px] font-bold text-sky-400 hover:underline"
-            >
-              Forgot?
-            </a>
           </div>
           <div className="relative">
             <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
@@ -201,7 +135,7 @@ export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
           ) : (
             <>
               <LogIn className="w-4 h-4" />
-              <span>Sign In as {role.toUpperCase()}</span>
+              <span>Sign In</span>
             </>
           )}
         </button>

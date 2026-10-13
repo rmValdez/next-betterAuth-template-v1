@@ -49,8 +49,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "NextTemplate | Enterprise Next.js Scaffold",
-    description:
-      "Connecting 450M Offline Stores to the World Through a Map, a Photo, and a Pickup.",
+    description: "A production-ready Enterprise Next.js Scaffold.",
     images: ["/og-image.png"],
   },
   icons: {

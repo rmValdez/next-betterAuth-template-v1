@@ -11,14 +11,14 @@ import { z } from "zod";
  */
 const envSchema = z.object({
   // ── Backend API ──────────────────────────────────────────────────────────
-  /** Web address of your backend server (e.g. http://localhost:3002/api/v1) */
+  /** Web address of your backend server (e.g. http://localhost:4009/api/v1) */
   NEXT_PUBLIC_API_URL: z
     .string({
       error: "Missing backend address (NEXT_PUBLIC_API_URL). Please check your .env.local file.",
     })
     .url({
       message:
-        "NEXT_PUBLIC_API_URL must be a valid web address starting with http:// or https:// (example: http://localhost:3002/api/v1).",
+        "NEXT_PUBLIC_API_URL must be a valid web address starting with http:// or https:// (example: http://localhost:4009/api/v1).",
     }),
 
   // ── Optional Auth Server ──────────────────────────────────────────────────
@@ -27,7 +27,7 @@ const envSchema = z.object({
     .string()
     .url({
       message:
-        "NEXT_PUBLIC_AUTH_URL must be a valid web address starting with http:// or https:// (example: http://localhost:3002).",
+        "NEXT_PUBLIC_AUTH_URL must be a valid web address starting with http:// or https:// (example: http://localhost:4009).",
     })
     .optional(),
 
@@ -37,7 +37,7 @@ const envSchema = z.object({
     .string()
     .url({
       message:
-        "NEXT_PUBLIC_SITE_URL must be a valid web address starting with http:// or https:// (example: http://localhost:3000).",
+        "NEXT_PUBLIC_SITE_URL must be a valid web address starting with http:// or https:// (example: http://localhost:4010).",
     })
     .optional(),
 
@@ -76,7 +76,7 @@ function createEnv() {
     console.error("\nHow to fix this:");
     console.error("  1. Look for the file named '.env.example' in the project root folder.");
     console.error("  2. Copy and paste it, then rename the copy to '.env.local'.");
-    console.error("  3. Make sure NEXT_PUBLIC_API_URL is filled in (example: http://localhost:3002/api/v1).");
+    console.error("  3. Make sure NEXT_PUBLIC_API_URL is filled in (example: http://localhost:4009/api/v1).");
     console.error("  4. Start the application again using: pnpm dev");
     console.error("=======================================================\n");
 
