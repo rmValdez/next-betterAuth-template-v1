@@ -2,10 +2,12 @@ export const featureManifest = {
   name: "auth",
   dependsOn: [] as const,
   exposes: [
+    "useAuth",
     "useAuthStore",
-    "SellerAuthGate",
-    "AdminAuthGate",
-    "AgentAuthGate",
+    "useMe",
+    "AuthGate",
+    "SessionHeader",
+    "ProfileCard",
   ] as const,
 } as const;
 

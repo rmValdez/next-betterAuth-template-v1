@@ -1,12 +1,13 @@
 // src/features/auth/index.ts
 export { default as LoginForm } from "./components/LoginForm";
 export { default as RegisterWorkflow } from "./components/RegisterWorkflow";
-export { AdminAuthGate } from "./components/AdminAuthGate";
-export { SellerAuthGate } from "./components/SellerAuthGate";
-export { AgentAuthGate } from "./components/AgentAuthGate";
+export { AuthGate } from "./components/AuthGate";
 export { AuthListener } from "./components/AuthListener";
+export { SessionHeader } from "./components/SessionHeader";
+export { ProfileCard } from "./components/ProfileCard";
 
 export { useAuth, clearAuthSession } from "./hooks/useAuth";
+export { useMe } from "./hooks/useMe";
 export { useAuthStore } from "./stores/auth.store";
 export * from "./contracts/auth.contract";
 export * from "./api/login.api";

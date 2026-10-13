@@ -7,8 +7,9 @@ import { useRouter } from "next/navigation";
 export default function RegisterEntryRoot() {
   const router = useRouter();
 
+  // Sign-up starts a session, so go straight to the workspace
   const handleRegisterSuccess = () => {
-    router.push("/login");
+    router.push("/dashboard");
   };
 
   return (

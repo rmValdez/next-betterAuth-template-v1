@@ -1,50 +1,40 @@
 import { z } from "zod";
 
-export const AuthUserSchema = z
-  .object({
-    id: z.string(),
-    email: z.string(),
-    firstName: z.string(),
-    lastName: z.string(),
-    isOnBoarding: z.boolean().optional(),
-  })
-  .passthrough();
+/** Roles assigned by node-betterAuth-postg-template (server-managed). */
+export const UserRoleSchema = z.enum(["USER", "ADMIN", "SUPER_ADMIN", "DEVELOPER"]);
 
-export const LoginResponseEnvelopeSchema = z.object({
-  data: z.object({
-    accessToken: z.string(),
-    refreshToken: z.string().optional(),
-    user: AuthUserSchema.optional(),
-    stores: z.array(z.unknown()).optional(),
-    seller: z
-      .object({
-        id: z.string(),
-        applicationStatus: z.string().optional(),
-        isOnboarded: z.boolean(),
-        onboardingStep: z.number(),
-        hasStores: z.boolean(),
-      })
-      .nullable()
-      .optional(),
-  }),
-});
-
+/** Result of a Better Auth sign-in / sign-up, normalized for the app. */
 export const AuthResultSchema = z.object({
+  /** Better Auth session token — sent as `Authorization: Bearer` by `fetcher`. */
   accessToken: z.string(),
-  refreshToken: z.string().optional(),
-  hasStores: z.boolean(),
-  user: AuthUserSchema.optional(),
-  seller: z
+  user: z
     .object({
       id: z.string(),
-      applicationStatus: z.string().optional(),
-      isOnboarded: z.boolean(),
-      onboardingStep: z.number(),
-      hasStores: z.boolean(),
+      email: z.string(),
+      name: z.string().nullable().optional(),
+      role: UserRoleSchema.optional(),
     })
-    .nullable()
     .optional(),
 });
 
-export type AuthUser = z.infer<typeof AuthUserSchema>;
+/** `GET /api/v1/auth/me` — profile plus the permissions derived from the role. */
+export const MeSchema = z.object({
+  id: z.string(),
+  email: z.string(),
+  name: z.string().nullable().optional(),
+  username: z.string().nullable().optional(),
+  avatar: z.string().nullable().optional(),
+  role: UserRoleSchema,
+  onboardingCompleted: z.boolean().optional(),
+  permissions: z.array(z.string()).default([]),
+});
+
+export const MeResponseSchema = z.object({
+  status: z.string().optional(),
+  statusCode: z.number().optional(),
+  data: MeSchema,
+});
+
+export type UserRole = z.infer<typeof UserRoleSchema>;
 export type AuthResult = z.infer<typeof AuthResultSchema>;
+export type Me = z.infer<typeof MeSchema>;
