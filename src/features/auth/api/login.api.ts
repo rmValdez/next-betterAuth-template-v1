@@ -5,7 +5,7 @@ import type { AuthResult, UserRole } from "../contracts/auth.contract";
 function toAuthResult(data: any): AuthResult {
   const user = data?.user;
   return {
-    accessToken: data?.token ?? "",
+    sessionToken: data?.token ?? "",
     user: user
       ? {
           id: user.id,
