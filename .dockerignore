@@ -7,3 +7,8 @@ README.md
 .git
 .github
 docs
+
+# Local env files must never be baked into an image; use build args
+.env
+.env.*
+!.env.example

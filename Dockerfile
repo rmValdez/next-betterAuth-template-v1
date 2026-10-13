@@ -21,6 +21,16 @@ COPY . .
 # Next.js telemetry is disabled
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# NEXT_PUBLIC_* values are inlined into the client bundle at build time, so
+# they must be passed as build args (local .env files are excluded by
+# .dockerignore). src/shared/lib/env.ts fails the build if the API URL is missing.
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_APP_ENV=production
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+    NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
+    NEXT_PUBLIC_APP_ENV=$NEXT_PUBLIC_APP_ENV
+
 RUN corepack enable pnpm && pnpm run build
 
 # Production image, copy all the files and run next
